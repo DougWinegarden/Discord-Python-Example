@@ -18,6 +18,24 @@ class BasicCog:
         # text "Pong!"
         await ctx.send("Pong!")
 
+        
+class TestCog:
+    def __init__(self, bot):
+        self.bot = bot
+    
+    @commands.command()
+    async def list(self, ctx):
+        await ctx.send("this is a test")
+
+class ResponseCog:
+    def __init__(self, bot):
+        self.bot = bot
+    
+    @commands.command()
+    async def respond(self, ctx):
+        await ctx.send("hey " + ctx.author.mention + "!")
+
 # add this cog to the bot
 def setup(bot):
-    bot.add_cog(BasicCog(bot))
+    bot.add_cog(ResponseCog(bot))
+    bot.add_cog(TestCog(bot))
