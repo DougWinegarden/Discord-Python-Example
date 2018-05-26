@@ -48,11 +48,30 @@ class ListCog:
     @commands.command()
     async def list(self, ctx, arg):
         if arg == "users":
+            conn = createConnection (sqlite_file)
+            c = conn.cursor()
+            """
             msg = "Users: "
             for i in range(len(user_list)):
                 if user_list[i].guild == ctx.author.guild:
                     msg += user_list[i].name + ", "
+                    """
+            #query database for users in the same guild as author
+            #SELECT username from USER u where u.guild_id = author.guild.id
+            c.execute("SELECT username from USER where user_guild_id = '" + str(ctx.author.guild.id) + "'")
+            query = c.fetchall()
+            msg = "Users: "
+            for i in range(len(query)):
+                a = str(query[i])
+                b = a[2:len(a) - 3]
+                msg += b
+                if i < len(query) - 1:
+                    msg += ", "
             await ctx.send(msg)
+
+            
+            conn.commit()
+            conn.close()
         else:
             await ctx.send("invalid argument");
 
@@ -62,8 +81,11 @@ class StartCog:
         self.bot = bot
     @commands.command()
     async def start(self, ctx):
-        addUser(ctx.author)
-        await ctx.send("...");
+        if addUser(ctx.author):
+            await ctx.send("...")
+
+        else:
+            await ctx.send("You've already started")
 
 def createConnection (sqlite_file):
     try:
@@ -84,33 +106,29 @@ def addUser(author):
     #print(author.guild)
 
     try:
-         #c.execute("INSERT INTO {tn} ({idf}, {cn}) VALUES (123456, 'test')".\
-        #c.execute("INSERT OR IGNORE INTO {tn} ({idf}) VALUES (" + str(author.guild.id) + ")".\
-            #format(tn=SERVER, idf=guild_id))
         c.execute("INSERT INTO SERVER (guild_id) VALUES (" + str(author.guild.id) + ")")
     except sqlite3.IntegrityError:
         print('ERROR: ID already exists in SERVER guild_id column {}')
 
     try:
-        #c.execute("INSERT INTO USER (member_id, username, discriminator, user_guild_id) " +
-         #         "VALUES (" + str(author.id) + ", " + str(author.name) + ", " +
-          #        author.discriminator + ", " + str(author.guild.id) + ")")
         params = (str(author.id), str(author.name), author.discriminator, str(author.guild.id))
         c.execute("INSERT INTO USER VALUES (?, ?, ?, ?)", params)
     except sqlite3.IntegrityError:
         print('ERROR: ID already exists in USER member_id column {}')
+        return False
     
-    
-    #this needs to add the author to the backend
     conn.commit()
     conn.close()
-
+    return True
+    
+"""
 def initUsers():
     conn = sqlite3.connect(sqlite_file)
     #this needs to initialize the list of users from
     # what is pulled from the backend
     conn.commit()
     conn.close()
+"""
 
 # add this cog to the bot
 def setup(bot):
