@@ -1,0 +1,48 @@
+CREATE TABLE SERVER (
+	guild_id varchar(18) PRIMARY KEY
+);
+
+CREATE TABLE USER(
+	member_id varchar PRIMARY KEY,
+	username varchar not null,
+	discriminator varchar not null,
+	user_guild_id varchar(18) not null,
+	wallet int,
+	foreign key(user_guild_id) REFERENCES SERVER(guild_id)
+);
+
+CREATE TABLE PET(
+	pet_id varchar PRIMARY KEY,
+	pet_name varchar not null,
+	species varchar not null check(species in ("fish", "dog", "cat")),
+	color varchar not null,
+	level int not null,
+	exp int not null,
+	
+	cur_happiness int not null,
+	cur_energy int not null,
+	cur_appearance int not null,
+	cur_fullness int not null,
+
+	max_happiness int not null,
+	max_energy int not null,
+	max_appearance int not null,
+	max_fullness int not null,
+
+	last_walk datetime,
+	last_play datetime,
+	last_pet datetime,
+	last_boop datetime,
+	last_groom datetime,
+	last_feed datetime,
+
+	pet_owner_id varchar not null,
+	foreign key(pet_owner_id) REFERENCES USER(member_id)
+);
+
+CREATE TABLE ITEM(
+	item_id varchar PRIMARY KEY,
+	item_name varchar not null,
+	item_owner_id varchar not null,
+	foreign key(item_owner_id) REFERENCES USER(member_id)
+);

@@ -54,7 +54,7 @@ async def on_ready():
           str(client.user.id) + '\n' + 'Version ' + str(discord.__version__))
     # a good way to let users know how to use the bot is by providing them with a help method
     # only way this can do them any good is by letting them know what the help command is
-    await client.change_presence(activity=discord.Game('Try !help'))
+    await client.change_presence(activity=discord.Game('Type !start'))
 
 # now actually connect the bot
 client.run(config.get(section='Configuration', option='connection_token'),
